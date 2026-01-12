@@ -1,5 +1,4 @@
 import asyncio
-
 from task.clients.client import DialClient
 from task.clients.custom_client import DialClient as CustomClient
 from task.constants import DEFAULT_SYSTEM_PROMPT
@@ -36,8 +35,12 @@ async def start(stream: bool) -> None:
         if message == "exit":
             break
         # 6. Add user message to conversation history (role 'user')
-
+        conversation.add_message(Message(Role.USER, message))
         # 7. If `stream` param is true -> call DialClient#stream_completion()
+        if stream:
+            await client.stream_completion(conversation.get_messages())
+        else:
+            client.get_completion(conversation.get_messages())
         #    else -> call DialClient#get_completion()
         # 8. Add generated message to history
         # 9. Test it with DialClient and CustomDialClient
